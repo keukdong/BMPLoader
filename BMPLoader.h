@@ -1,6 +1,4 @@
 #pragma once
-#include "Component\Component.h"
-#include "GameObject.h"
 #include <iostream>
 
 ENGINE_USING
