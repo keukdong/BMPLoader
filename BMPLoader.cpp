@@ -1,7 +1,4 @@
 #include "BMPLoader.h"
-
-#include "PathManager.h"
-
 CBMPLoader::CBMPLoader()
 {
 	m_iFormat = -1;
@@ -13,78 +10,6 @@ CBMPLoader::~CBMPLoader()
 	if (!m_pPixel)
 		delete[] m_pPixel;
 }
-
-void CBMPLoader::LoadBMPFile(const TCHAR* pFileName, const string& strPathKey)
-{
-	FILE* pFile = nullptr;
-
-	TCHAR pPath[MAX_PATH] = { 0, };
-
-	lstrcpy(pPath, GET_SINGLE(CPathManager)->FindPath(strPathKey));
-	lstrcat(pPath, pFileName);
-
-	char pFullPath[MAX_PATH] = { 0, };
-#ifdef UNICODE
-	int len = WideCharToMultiByte(CP_ACP, 0, pPath, lstrlen(pPath), 0, 0, 0, 0);
-	WideCharToMultiByte(CP_ACP, 0, pPath, lstrlen(pPath), pFullPath, len, 0, 0);
-#else
-	strcpy(pFullPath, pPath);
-#endif	
-	fopen_s(&pFile, pFullPath, " rb");
-	
-	if (!pFile)
-		return;
-	
-	BITMAPFILEHEADER	tFile;
-	BITMAPINFOHEADER	tInfo;
-
-	fread(&tFile, sizeof(tFile), 1, pFile);
-	fread(&tInfo, sizeof(tInfo), 1, pFile);
-
-	switch (tInfo.biBitCount)
-	{
-	case 8:
-		m_iFormat = 1;
-		break;
-	case 24:
-		m_iFormat = 3;
-		break;
-	case 32:
-		m_iFormat = 4;
-		break;
-	}
-
-	// image must be m_iFormat 4. 
-	// bmp pixel saved as ( b g r ) 3byte
-
-	int iBMPPixelSize = tInfo.biWidth * tInfo.biHeight * (m_iFormat+1);
-
-	m_iWidth = tInfo.biWidth;
-	m_iHeight = tInfo.biHeight;
-
-	m_pPixel = new char[iBMPPixelSize];
-	memset(m_pPixel, 0, sizeof(char) * iBMPPixelSize);
-	fread(m_pPixel, sizeof(char), iBMPPixelSize, pFile);
-
-	// reverse bmp image
-	int iLineSize = tInfo.biWidth * m_iFormat;
-	char* pLine = new char[iLineSize];
-
-	for (int i = 0; i < tInfo.biHeight / 2; ++i)
-	{
-		int	iStart = i * iLineSize;
-		int	iEnd = (tInfo.biHeight - i - 1) * iLineSize;
-
-		memcpy(pLine, &m_pPixel[iStart], iLineSize);
-		memcpy(&m_pPixel[iStart], &m_pPixel[iEnd], iLineSize);
-		memcpy(&m_pPixel[iEnd], pLine, iLineSize);
-	}
-
-	delete[]	pLine;
-
-	fclose(pFile);
-}
-
 void CBMPLoader::LoadBMPFileFromLocal(const char* pFileName, const char* pFilefullpath)
 {
 	FILE* pFile = nullptr;
@@ -117,7 +42,7 @@ void CBMPLoader::LoadBMPFileFromLocal(const char* pFileName, const char* pFilefu
 	if(tInfo.biBitCount != 32)
 	{
 		return;
-		MessageBoxEx(0, TEXT("32bit bmp ÀÌ¹ÌÁö°¡ ¾Æ´Õ´Ï´Ù."), TEXT("BMPLoader"), MB_OK, 0);
+		MessageBoxEx(0, TEXT("32bit bmp ì´ë¯¸ì§€ê°€ ì•„ë‹™ë‹ˆë‹¤."), TEXT("BMPLoader"), MB_OK, 0);
 	}
 
 	m_iFormat = 4;
@@ -185,7 +110,7 @@ void CBMPLoader::GetBMPInfoTextFile(const char* pFilefullpath)
 
 		for (int i = 0; i < m_iWidth; ++i)
 		{
-			fprintf_s(pPixel, "%d¹øÂ° ÁÙ : \n", i);
+			fprintf_s(pPixel, "%dë²ˆì§¸ ì¤„ : \n", i);
 			for (int j = 0; j < m_iHeight; ++j)
 			{
 				int index = j * m_iWidth * m_iFormat + i * m_iFormat;
