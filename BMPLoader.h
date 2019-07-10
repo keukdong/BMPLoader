@@ -19,7 +19,6 @@ private:
 	char*	m_pPixel;
 
 public:
-	void LoadBMPFile(const TCHAR* pFileName, const string& strPathKey = TEXTURE_PATH);
 	void LoadBMPFileFromLocal(const char* pFileName, const char* pFilefullpath = nullptr);
 
 	Vector3 GetPixelColor(int x, int y);
